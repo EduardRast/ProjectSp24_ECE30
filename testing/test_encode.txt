@@ -1,0 +1,5 @@
+.long
+encode: 16
+symbol: 56
+encodeArr: 1, 2, 3, 4, -1
+symbolArr: 1, 4, 2, 5, 3, 7, 4, 9, -1
