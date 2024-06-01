@@ -74,6 +74,7 @@ skipR:  stur x3, [x1, #0]
         b.gt StoreNode
         br lr
 
+
 ////////////////////////
 //                    //
 //   IsContain        //
@@ -131,8 +132,8 @@ Encode:
 	addi x20, xzr, x0 // x20 = node
 	addi x22, xzr, x2 // x22 = symbol
 
-	ldur x5, [x0,16] // x3 = left_node
-	ldur x6, [x0,24] // x4 = right_node
+	ldur x5, [x0,#16] // x3 = left_node
+	ldur x6, [x0,#24] // x4 = right_node
 
 
 	subs xzr, x5, x6 // if left_node!=right_node -> end
@@ -147,7 +148,6 @@ Encode:
 	putint x3 //print 0
 
 	//call encode
-	
 
 	E0:
 	addi x3,x3,#1 //x3 = 1
