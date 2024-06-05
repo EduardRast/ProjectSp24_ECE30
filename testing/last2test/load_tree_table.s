@@ -13,7 +13,7 @@ main:   lda x4, tree            // load pointer to tree root
         // by this point, you have everything you need to perform encoding
         lda x4, tree            // load pointer to tree root
         ldur x0, [x4, #0]
-        lda x5, encode          // load pointer to symbols to be encoded
+        lda x5, Encode          // load pointer to symbols to be encoded
         ldur x1, [x5, #0]
 
 
@@ -128,35 +128,56 @@ Encode:
 	STUR	LR, [SP, #8]	// LR should be saved to retrieve it later
 	ADDI	FP, SP, #56	
 
-	// save the original values
-	addi x20, xzr, x0 // x20 = node
-	addi x22, xzr, x2 // x22 = symbol
 
-	ldur x5, [x0,#16] // x3 = left_node
-	ldur x6, [x0,#24] // x4 = right_node
-
+	add x4, xzr,x0 // X4 - original node
+	ldur x5, [x0,#16] // x5 = left_node
+	ldur x6, [x0,#24] // x6 = right_node
 
 	subs xzr, x5, x6 // if left_node!=right_node -> end
 	b.eq Ereturn
 	// prepare registers for iscontain
-	ldur x0,[x5,#0] // x0 = left_node
-	ldur x1,[x5,#8] //x1 = left_node+1
+	// prepare variable for calling the iscontain
+	STUR X0, [SP, #16]	
+	STUR x1, [SP, #24]	
+	STUR X2, [SP, #32]	
+
+	addi x0,x4,#16 // x0 = left_node
+	addi x1,x4,#24 //x1 = left_node+1
 	//call the IsContain, returns x3
+	
+	BL IsContain
+	LDUR X0, [SP, #16]	
+	LDUR x1, [SP, #24]	
+	LDUR X2, [SP, #32]	
 
 	cbz x3, E0 //check the output from iscontain, branch is 0 
 	subi x3,x3,#1 // x3 = 0
 	putint x3 //print 0
 
 	//call encode
+	STUR X0, [SP, #16]	
+	STUR X2, [SP, #24]	
+	add x0,xzr,x5 // x0 = left_node
+	BL Encode
+	LDUR X0, [SP, #16]	
+	LDUR X2, [SP, #24]	
 
 	E0:
 	addi x3,x3,#1 //x3 = 1
 	putint x3 // print 1
 
 	//call encode
+	STUR X0, [SP, #16]	
+	STUR X2, [SP, #24]	
+	add x0,xzr,x6 // x0 = right_node
+	BL Encode
+	LDUR X0, [SP, #16]	
+	LDUR X2, [SP, #24]	
 
 	Ereturn: 
 	LDUR	FP, [SP, #0]	// Restore FP to what it was at the start
 	LDUR	LR, [SP, #8]	// Restore LR to what it was at the start
 	ADDI	SP, SP, #56	// Free up the space we took on stack by moving SP
 	BR	LR		// Return to the parent call
+
+	
